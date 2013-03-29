@@ -66,14 +66,16 @@
 	var tatumsPerMeasure = (96 * timeSignature[0]) / timeSignature[1];
 
 	//sets the tempo, either instantly or over a period of time
-	function setTempo(bpm, curveTime) {
+	METRO.setTempo = function(bpm, curveTime) {
 		bpm = bpm;
 		//set the clock (with the optional curveTime)
+		var now = audioContext.currentTime;
+		var curve = curveTime || 0;
 		oscillator.frequency.value = (bpm / 60) * (tatumsPerMeasure / 4);
 	};
 
 	//updates the time siganture
-	function setTimeSignature() {
+	METRO.setTimeSignature = function() {
 		var args = Array.prototype.slice.call(arguments);
 		if(args.length === 2) {
 			timeSignature = [args[0], args[1]];
@@ -85,6 +87,8 @@
 		}
 		//updates the tatums per measure when the time sig changes
 		tatumsPerMeasure = (96 * timeSignature[0]) / timeSignature[1];
+		//update the oscillator
+		METRO.setTempo(bpm);
 	};
 
 	//state is either 'counting', 'stopped', or 'paused'
