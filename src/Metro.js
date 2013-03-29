@@ -59,11 +59,13 @@
 	//some default values
 	var bpm = 120;
 	var timeSignature = [4, 4];
+	var timeSigRatio = (timeSignature[0] / timeSignature[1]);
 
 	//the tatum is the smallest time increment;
 	var tatum = 0;
 	//the number of tatums in a measure
 	var tatumsPerMeasure = (96 * timeSignature[0]) / timeSignature[1];
+	
 
 	//sets the tempo, either instantly or over a period of time
 	METRO.setTempo = function(bpm, curveTime) {
@@ -88,6 +90,7 @@
 		}
 		//updates the tatums per measure when the time sig changes
 		tatumsPerMeasure = (96 * timeSignature[0]) / timeSignature[1];
+		timeSigRatio = (timeSignature[0] / timeSignature[1]);
 		//update the oscillator
 		METRO.setTempo(bpm);
 	};
@@ -109,7 +112,7 @@
 			})
 		}
 		//update each of the subdivisions
-		var measurePosition = tatum / tatumsPerMeasure;
+		var measurePosition = (tatum / tatumsPerMeasure) * timeSigRatio;
 		var subdivisions = [2, 3, 4, 6, 8, 12, 16, 24, 32, 48];
 		for(var i = 0, len = subdivisions.length; i < len; i++) {
 			var sub = subdivisions[i];
@@ -125,7 +128,7 @@
 				})
 				//roll back to 0 if it's reached the end of the measure
 				//make an exception for 1n so that we have a measure counter
-				if(count === sub && sub !== 1) {
+				if(count === sub * timeSigRatio && sub !== 1) {
 					beats[subString] = 0;
 				}
 			}
