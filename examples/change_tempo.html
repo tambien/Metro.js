@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<head>
+	<title>DIFFERENT TEMPO</title>
+	<script type="text/javascript" charset="UTF-8" src="http://tambien.github.com/odot.js/src/odot.js"></script>
+	<script type="text/javascript" charset="UTF-8" src="../src/Metro.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		//make a metronome
+		METRO.start(96);
+		//route anything after the slash
+		o.route ("/metro/4n", function(msg){
+			document.getElementById("quarterNumber").innerHTML = msg.data;
+		})
+		//route anything after the slash
+		o.route ("/metro/1n", function(msg){
+			document.getElementById("wholeNumber").innerHTML = msg.data;
+		})
+	</script>
+	<div>
+		<div style='float:left'>Quarter Note: </div><div id='quarterNumber'>0</div>
+		<div style='float:left'>Whole Note: </div><div id='wholeNumber'>0</div>
+	</div>
+	
+</body>

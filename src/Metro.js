@@ -143,8 +143,9 @@
 
 	var oscillator;
 
-	METRO.start = function(when) {
-		when = when | audioContext.currentTime;
+	METRO.start = function(optionalBPM) {
+		var tempoBPM = optionalBPM || bpm;
+		var now = audioContext.currentTime;
 		//create an oscillator at the right resolution
 		oscillator = audioContext.createOscillator();
 		//square wave
@@ -152,11 +153,10 @@
 		//this.phase = 0;
 		tatum = 0;
 		//set bpm
-		//this.setBPM(this);
-		setTempo(bpm);
+		METRO.setTempo(tempoBPM);
 		//connect the oscillator
 		oscillator.connect(scriptNode);
-		oscillator.noteOn(when);
+		oscillator.noteOn(now);
 		state = 'counting';
 	};
 
