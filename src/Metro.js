@@ -71,9 +71,10 @@
 		//set the clock (with the optional curveTime)
 		var now = audioContext.currentTime;
 		var curve = curveTime || 0;
-		oscillator.frequency.value = (bpm / 60) * (tatumsPerMeasure / 4);
+		if(oscillator) {
+			oscillator.frequency.value = (bpm / 60) * (tatumsPerMeasure / 4);
+		}
 	};
-
 	//updates the time siganture
 	METRO.setTimeSignature = function() {
 		var args = Array.prototype.slice.call(arguments);
@@ -90,7 +91,6 @@
 		//update the oscillator
 		METRO.setTempo(bpm);
 	};
-
 	//state is either 'counting', 'stopped', or 'paused'
 	var state = 'stopped';
 

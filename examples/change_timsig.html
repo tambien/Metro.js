@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<head>
+	<title>DIFFERENT TEMPO</title>
+	<script type="text/javascript" charset="UTF-8" src="http://tambien.github.com/odot.js/src/odot.js"></script>
+	<script type="text/javascript" charset="UTF-8" src="../src/Metro.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		//set the time signature
+		//METRO.setTimeSignature(4, 4);
+		//set the tempo optionally as an argument to start
+		METRO.start(120);
+		//route anything after the slash
+		o.route("/metro/4n", function(msg) {
+			document.getElementById("quarterNote").innerHTML = msg.data;
+		})
+		//route anything after the slash
+		o.route("/metro/1n", function(msg) {
+			document.getElementById("wholeNumber").innerHTML = msg.data;
+		})
+	</script>
+	<div>
+		<div style='float:left'>
+			Quarter Note:
+		</div>
+		<div id='quarterNote'>
+			0
+		</div>
+		<div style='float:left'>
+			Measure Number:
+		</div>
+		<div id='wholeNumber'>
+			0
+		</div>
+	</div>
+</body>

@@ -3,7 +3,7 @@ Add a listener to one of the beats to recieve an o.msg with the precise timetag 
 
 
 Features: 
-- up to 32nd duples and triplets.
+- up to 32nd duplets and tuplets.
 - Any tempo, and time signature. 
 - Callbacks always happen before the beat
 
