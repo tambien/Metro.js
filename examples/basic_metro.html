@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<head>
+	<title>BASIC METRONOME</title>
+	<script type="text/javascript" charset="UTF-8" src="../src/odot.js"></script>
+	<script type="text/javascript" charset="UTF-8" src="../src/Metro.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		//make a metronome
+		METRO.start();
+		//route anything after the slash
+		o.route ("/metro/2n", function(msg){
+			document.getElementById("halfNumber").innerHTML = msg.data;
+		})
+		//route anything after the slash
+		o.route ("/metro/1n", function(msg){
+			document.getElementById("wholeNumber").innerHTML = msg.data;
+		})
+	</script>
+	<div>
+		<div style='float:left'>Half Note: </div><div id='halfNumber'>0</div>
+		<div style='float:left'>Whole Note: </div><div id='wholeNumber'>0</div>
+	</div>
+	
+</body>
