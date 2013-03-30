@@ -13,21 +13,6 @@
 	 BEATS
 	 *************************************************************************/
 
-	//the count of all of the beats of the metronome
-	var beats = {
-		"1n" : 0,
-		"2n" : 0,
-		"2t" : 0,
-		"4n" : 0,
-		"4t" : 0,
-		"8n" : 0,
-		"8t" : 0,
-		"16n" : 0,
-		"16t" : 0,
-		"32n" : 0,
-		"32t" : 0,
-	}
-
 	//the durations of all the beats
 	var beatDurations = {
 		"1n" : 0,
@@ -58,23 +43,23 @@
 		"32t" : 48,
 	}
 
-	//translates the subdivisions of the measure into the strings
-	var subdivisionStrings = {
-		1 : '1n',
-		2 : '2n',
-		3 : '2t',
-		4 : '4n',
-		6 : '4t',
-		8 : '8n',
-		12 : '8t',
-		16 : '16n',
-		24 : '16t',
-		32 : '32n',
-		48 : '32t',
+	// the subdivisions of the measure in 4/4 time
+	var measureSubdivision = {
+		"1n" : 1,
+		"2n" : 2,
+		"2t" : 3,
+		"4n" : 4,
+		"4t" : 6,
+		"8n" : 8,
+		"8t" : 12,
+		"16n" : 16,
+		"16t" : 24,
+		"32n" : 32,
+		"32t" : 48,
 	}
 
-	//the default subdivisions which the metronome tics on
-	var subdivisions = ["1n", '4n'];
+	//the default subdivisions which the metronome ticks on
+	var tickOn = ["1n", '4n', '8n'];
 
 	/**************************************************************************
 	 TEMPO and TIME SIGNATURE
@@ -89,24 +74,22 @@
 		var timeSigRatio = timeSignature[0] / timeSignature[1];
 		var measureInSeconds = (60 / bpm) * 4 * timeSigRatio;
 		//set the durations of all the subdivisions
-		for(subdivision in subdivisionStrings) {
-			var sub = subdivisionStrings[subdivision];
-			var BperM = beatsPerMeasure[sub];
+		for(beat in beatDurations) {
+			var BperM = beatsPerMeasure[beat];
 			var subTime = measureInSeconds / BperM;
-			beatDurations[sub] = subTime;
+			beatDurations[beat] = subTime;
 		}
-		console.log(beatDurations);
 	};
 
 	//updates the time siganture
 	function setTimeSignature(timeSig) {
 		timeSignature = timeSig;
 		//update the beats per measure object
-		for(subdivision in subdivisionStrings) {
+		for(subdivision in measureSubdivision) {
 			//don't count 1n since that's always 1
-			if(subdivision !== '1') {
-				var beatCount = parseInt(subdivision * (timeSig[0] / timeSig[1]));
-				beatsPerMeasure[subdivisionStrings[subdivision]] = beatCount;
+			if(subdivision !== '1n') {
+				var beatCount = parseInt(measureSubdivision[subdivision] * (timeSig[0] / timeSig[1]));
+				beatsPerMeasure[subdivision] = beatCount;
 			}
 		}
 	};
@@ -132,7 +115,7 @@
 		//get the next beat time
 		var nextTime = msg.timetag + beatDurations[sub];
 		//schedule the new msg
-		var msg = new o.msg({
+		MSG.schedule({
 			address : msg.address,
 			timetag : nextTime,
 			data : count,
@@ -147,7 +130,7 @@
 		args = args || {};
 		var tempo = args.bpm || bpm;
 		var timeSig = args.timeSignature || timeSignature;
-		var subdivision = args.subdivision || subdivisions;
+		var subdivision = args.subdivision || tickOn;
 		setTimeSignature(timeSig);
 		setTempo(tempo);
 		//set the state
@@ -156,7 +139,7 @@
 		var now = audioContext.currentTime;
 		for(var s = 0; s < subdivision.length; s++) {
 			var sub = subdivision[s];
-			var msg = new o.msg({
+			MSG.schedule({
 				address : "/metro/" + sub,
 				timetag : now,
 				//starts with a count of 0
@@ -164,7 +147,7 @@
 			})
 		}
 		//add the msg listener
-		o.route("/metro/*", echo);
+		MSG.route("/metro/*", echo);
 	};
 
 	METRO.stop = function(when) {

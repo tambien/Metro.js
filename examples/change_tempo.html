@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <head>
 	<title>DIFFERENT TEMPO</title>
-	<script type="text/javascript" charset="UTF-8" src="http://tambien.github.com/odot.js/src/odot.js"></script>
+	<script type="text/javascript" charset="UTF-8" src="http://tambien.github.com/oMSG.js/src/oMSG.js"></script>
 	<script type="text/javascript" charset="UTF-8" src="../src/Metro.js"></script>
 </head>
 <body>
@@ -10,10 +10,10 @@
 		METRO.start({
 			bpm : 96
 		});
-		o.route("/metro/4n", function(msg) {
+		MSG.route("/metro/4n", function(msg) {
 			document.getElementById("halfNumber").innerHTML = msg.data;
 		})
-		o.route("/metro/1n", function(msg) {
+		MSG.route("/metro/1n", function(msg) {
 			document.getElementById("wholeNumber").innerHTML = msg.data;
 		})
 	</script>
@@ -22,13 +22,13 @@
 			Quarter Note:
 		</div>
 		<div id='halfNumber'>
-			0
+			STOPPED
 		</div>
 		<div style='float:left'>
 			Whole Note:
 		</div>
 		<div id='wholeNumber'>
-			0
+			STOPPED
 		</div>
 	</div>
 </body>
