@@ -9,17 +9,26 @@
 		//make a metronome
 		METRO.start();
 		//route anything after the slash
-		o.route ("/metro/2n", function(msg){
+		o.route("/metro/4n", function(msg) {
 			document.getElementById("halfNumber").innerHTML = msg.data;
 		})
 		//route anything after the slash
-		o.route ("/metro/1n", function(msg){
+		o.route("/metro/1n", function(msg) {
 			document.getElementById("wholeNumber").innerHTML = msg.data;
 		})
 	</script>
 	<div>
-		<div style='float:left'>Half Note: </div><div id='halfNumber'>0</div>
-		<div style='float:left'>Whole Note: </div><div id='wholeNumber'>0</div>
+		<div style='float:left'>
+			Quarter Note:
+		</div>
+		<div id='halfNumber'>
+			0
+		</div>
+		<div style='float:left'>
+			Whole Note:
+		</div>
+		<div id='wholeNumber'>
+			0
+		</div>
 	</div>
-	
 </body>

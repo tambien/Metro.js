@@ -7,9 +7,9 @@
 <body>
 	<script type="text/javascript">
 		//set the time signature
-		METRO.setTimeSignature(3, 4);
-		//set the tempo optionally as an argument to start
-		METRO.start(120);
+		METRO.start({
+			timeSignature : [3, 4]
+		});
 		//route anything after the slash
 		o.route("/metro/4n", function(msg) {
 			document.getElementById("quarterNote").innerHTML = msg.data;
