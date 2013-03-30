@@ -107,7 +107,7 @@
 		var sub = msg.address.split("/")[2];
 		//increment the counter
 		var count = msg.data + 1;
-		//roll over when the counter has reached it's max
+		//roll over when the beat has reached it's max for that subdivision
 		if(sub !== '1n') {
 			var max = beatsPerMeasure[sub];
 			count = count % max;
@@ -119,7 +119,7 @@
 			address : msg.address,
 			timetag : nextTime,
 			data : count,
-		})
+		});
 	}
 
 	/**************************************************************************
@@ -127,14 +127,15 @@
 	 *************************************************************************/
 
 	METRO.start = function(args) {
+		//set the state
+		state = 'counting';
+		//parse the arguments
 		args = args || {};
 		var tempo = args.bpm || bpm;
 		var timeSig = args.timeSignature || timeSignature;
 		var subdivision = args.subdivision || tickOn;
 		setTimeSignature(timeSig);
 		setTempo(tempo);
-		//set the state
-		state = 'counting';
 		//schedule the first messages
 		var now = audioContext.currentTime;
 		for(var s = 0; s < subdivision.length; s++) {
@@ -151,10 +152,14 @@
 	};
 
 	METRO.stop = function(when) {
-
+		//set the state
+		state = 'stopped';
+		//unroute all the messages
 	};
 
 	METRO.pause = function(when) {
-
+		//set the state
+		state = 'paused';
+		//unroute all the messages
 	};
 }());

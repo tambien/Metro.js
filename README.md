@@ -1,13 +1,15 @@
 Metro.js uses oMSG.js to create a metronome for Web Audio. 
 
 Features: 
-- up to 32nd duplets and tuplets.
-- Any tempo, and time signature. 
-- Callbacks always happen before the beat 
+- Count up to 32nd triplets
+- Any tempo and time signature. 
+- Callbacks always happen before the beat and have the exact timetag of the beat 
 
 Metro.js has one dependecy: oMSG.js (a small library for audio-rate scheduling).
 
 https://github.com/tambien/oMSG.js
+
+# Basic Usage
 
 Use the 'start' method to start ticking with optional arguments
 ```javascript
@@ -32,4 +34,7 @@ MSG.route("/metro/1n", function(msg){
 });
 ``` 
 
+# Subdivisions
 
+For duple subdivisions use 'n' at the end of the number. For example, '8n' is a straight eighth note. 
+Metro.js can also handle triplet subdivisions using 't' notation. For example, '4t' represents a quarter note tuplet.
