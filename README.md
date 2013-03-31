@@ -1,11 +1,11 @@
-Metro.js uses oMSG.js to create a metronome for Web Audio. 
+Metro.js uses MSG.js to create a metronome for Web Audio. 
 
 Features: 
 - Count up to 32nd triplets
 - Any tempo and time signature. 
 - Callbacks always happen before the beat and have the exact timetag of the beat 
 
-Metro.js has one dependecy: oMSG.js (a small library for audio-rate scheduling).
+Metro.js has one dependecy: MSG.js (a small library for audio-rate scheduling).
 
 https://github.com/tambien/oMSG.js
 
