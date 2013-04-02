@@ -7,7 +7,7 @@ Features:
 
 Metro.js has one dependecy: MSG.js (a small library for audio-rate scheduling).
 
-https://github.com/tambien/oMSG.js
+https://github.com/tambien/MSG.js
 
 # Basic Usage
 
@@ -36,5 +36,5 @@ MSG.route("/metro/1n", function(msg){
 
 # Subdivisions
 
-For duple subdivisions use 'n' at the end of the number. For example, '8n' is a straight eighth note. 
-Metro.js can also handle triplet subdivisions using 't' notation. For example, '4t' represents a quarter note tuplet.
+For duple subdivisions use 'n' at the end of the number such as '8n' for a straight eighth note. 
+Metro.js can also handle triplet subdivisions using 't' notation. For example, '4t' is a quarter note triplet.
