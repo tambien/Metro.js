@@ -274,6 +274,9 @@ keeps time
 	 ECHO
 	 *************************************************************************/
 
+ 	//add the msg listener
+	METRO.route("/metro/*", echo);
+
 	//this function schedules a new message when one is recieved
 	function echo(msg) {
 		//get the subdivision from the address
@@ -322,8 +325,6 @@ keeps time
 				data : 0,
 			});
 		}
-		//add the msg listener
-		METRO.route("/metro/*", echo);
 		//start the jsnode
 		scheduler = audioContext.createJavaScriptNode(bufferSize, 1, 1);
 		scheduler.onaudioprocess = onAudioProcess;
@@ -335,5 +336,7 @@ keeps time
 		state = 'stopped';
 		//clear all the messages
 		scheduledMsgs = [];
+		//disconnect the jsnode
+		scheduler.disconnect();
 	};
 }());
