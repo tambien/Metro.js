@@ -1,8 +1,14 @@
-/*
- * METRONOME
- *
- * keeps tempo
- */
+/******************************************************************************
+ __   __  _______  _______  ______    _______ 
+|  |_|  ||       ||       ||    _ |  |       |
+|       ||    ___||_     _||   | ||  |   _   |
+|       ||   |___   |   |  |   |_||_ |  | |  |
+|       ||    ___|  |   |  |    __  ||  |_|  |
+| ||_|| ||   |___   |   |  |   |  | ||       |
+|_|   |_||_______|  |___|  |___|  |_||_______|
+
+keeps time
+******************************************************************************/
 
 ( function() {
 
@@ -10,7 +16,174 @@
 	window.METRO = window.METRO || {};
 
 	/**************************************************************************
-	 BEATS
+	 AUDIO CONTEXT
+	 *************************************************************************/
+
+	//if there isn't already an audioContext
+	if (!window.audioContext){
+		//make a new one
+		if ( window.webkitAudioContext ) {
+			window.audioContext = new webkitAudioContext();
+		} else if ( window.AudioContext ) {
+			window.audioContext = new AudioContext();
+		}
+	}
+	//local version
+	var audioContext = window.audioContext;
+
+	/**************************************************************************
+	 SCHEDULER
+	 *************************************************************************/
+
+	//the priority queue of scheduled msgs
+	var scheduledMsgs = [];
+	//the jsnode
+	var scheduler;
+
+	function onAudioProcess (event) {
+		var bufferSize = event.inputBuffer.length;
+		var bufferTime = bufferSize / audioContext.sampleRate;
+		//when are they going to implement the playbackTime?
+		var playbackTime = event.playbackTime || audioContext.currentTime;
+		var bufferPeriod = playbackTime + bufferTime;
+		//route all of the message's whose timetag is <= the current time period
+		while(scheduledMsgs.length > 0 && scheduledMsgs[0].timetag <= bufferPeriod) {
+			var msg = scheduledMsgs.shift();
+			match(msg);
+		}
+	}
+
+	METRO.schedule = function(msg) {
+		//make sure the message is formatted correctly
+		parseMsg(msg);
+		//insert the message in the right position
+		var insertIndex = 0;
+		var len = scheduledMsgs.length;
+		while(insertIndex < len) {
+			var testMsg = scheduledMsgs[insertIndex];
+			//if the next message is bigger, put it right before
+			if(testMsg.timetag >= msg.timetag) {
+				break;
+			}
+			insertIndex++;
+		}
+		scheduledMsgs.splice(insertIndex, 0, msg);
+		return msg;
+	};
+
+	/**************************************************************************
+	 ROUTING
+	 *************************************************************************/
+
+	//the array of listeners waiting for a msg
+	var routes = [];
+
+	//the route function adds a listener to a pattern
+	//and invokes the callback when a msg matching that pattern is scheduled
+	METRO.route = function(pattern, callback) {
+		//add a listener to the queue
+		var router = {
+			pattern : pattern,
+			regExp : regExpFromPattern(pattern),
+			callback : callback,
+		}
+		routes.push(router);
+		return router;
+	};
+	//like route, but get's removed from the route array after it's routed
+	METRO.routeOnce = function(pattern, callback) {
+		//add a listener to the queue
+		var router = {
+			pattern : pattern,
+			regExp : regExpFromPattern(pattern),
+			callback : callback,
+			once : true,
+		}
+		routes.push(router);
+		return router;
+	};
+	//remove a route from the list
+	METRO.unroute = function(router) {
+		for(var i = 0, len = routes.length; i < len; i++) {
+			var testRouter = routes[i];
+			if(testRouter === router) {
+				routes.splice(i, 1);
+				break;
+			}
+		}
+	}
+	//the match function called by the scheduler when a msgs is invoked
+	function match(msg) {
+		var newRoutes = [];
+		for(var r = 0, len = routes.length; r < len; r++) {
+			var router = routes[r];
+			if(router.regExp.test(msg.address)) {
+				router.callback(msg);
+				//if it's a 'once', don't add it to the newRoutes list
+				if(!router.once) {
+					newRoutes.push(router);
+				}
+			} else {
+				newRoutes.push(router);
+			}
+		}
+		routes = newRoutes;
+	};
+
+	//translates OSC regular expressions to RegExp
+	function regExpFromPattern(pattern) {
+		//translate osc-style patterns into RegExp
+		pattern = pattern.replace("*", ".+");
+		pattern = pattern.replace('{', "(");
+			pattern = pattern.replace('}', ")");
+			pattern = pattern.replace(',', "|");
+			pattern = pattern.replace('?', '.');
+		//match '!' only if after '['
+		pattern = pattern.replace('[!', '[^');
+		//add the end-of-line to the pattern so that it stops matching
+		pattern += '$';
+		var regExp = new RegExp(pattern);
+		return regExp;
+	};
+
+	/**************************************************************************
+	 MSG PARSER
+	 *************************************************************************/
+
+	//make sure all of the fields are in order
+	function parseMsg(msg) {
+		//messages must have an address
+		if(!msg.address) {
+			console.error("the message needs an address");
+		}
+		//handle the timetag
+		var timetag = msg.timetag;
+		//if it's a string
+		if( typeof timetag === 'string') {
+			//it could be a relative value: "+1.2"
+			//or beat relative like "+1n" happens in 1 measure from now
+			if(timetag.charAt(0) === "+") {
+				var num = timetag.slice(1);
+				//test if it's a beat format
+				var beatFormat = new RegExp(/[0-9]+[nt]$/);
+				if (beatFormat.test(num)){
+					//get the duration of the beat
+					msg.timetag = audioContext.currentTime+ beatDurations(num);
+				} else {
+					msg.timetag = audioContext.currentTime + parseFloat(num);
+				}
+			} else {
+				//or just a number as a string
+				msg.timetag = parseFloat(timetag);
+			}
+		} else if( typeof timetag !== 'number') {
+			//otherwise it's 0
+			msg.timetag = 0;
+		}
+	};
+
+	/**************************************************************************
+	 TIMING
 	 *************************************************************************/
 
 	//the durations of all the beats
@@ -115,7 +288,7 @@
 		//get the next beat time
 		var nextTime = msg.timetag + beatDurations[sub];
 		//schedule the new msg
-		MSG.schedule({
+		METRO.schedule({
 			address : msg.address,
 			timetag : nextTime,
 			data : count,
@@ -134,32 +307,33 @@
 		var tempo = args.bpm || bpm;
 		var timeSig = args.timeSignature || timeSignature;
 		var subdivision = args.subdivision || tickOn;
+		var bufferSize = args.bufferSize || 512;
+		var delay = args.delay || 0;
 		setTimeSignature(timeSig);
 		setTempo(tempo);
 		//schedule the first messages
-		var now = audioContext.currentTime;
+		var now = audioContext.currentTime + delay;
 		for(var s = 0; s < subdivision.length; s++) {
 			var sub = subdivision[s];
-			MSG.schedule({
+			METRO.schedule({
 				address : "/metro/" + sub,
 				timetag : now,
 				//starts with a count of 0
 				data : 0,
-			})
+			});
 		}
 		//add the msg listener
-		MSG.route("/metro/*", echo);
+		METRO.route("/metro/*", echo);
+		//start the jsnode
+		scheduler = audioContext.createJavaScriptNode(bufferSize, 1, 1);
+		scheduler.onaudioprocess = onAudioProcess;
+		scheduler.connect(audioContext.destination);
 	};
 
 	METRO.stop = function(when) {
 		//set the state
 		state = 'stopped';
-		//unroute all the messages
-	};
-
-	METRO.pause = function(when) {
-		//set the state
-		state = 'paused';
-		//unroute all the messages
+		//clear all the messages
+		scheduledMsgs = [];
 	};
 }());

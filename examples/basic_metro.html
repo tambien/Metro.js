@@ -1,7 +1,6 @@
 <!DOCTYPE HTML>
 <head>
 	<title>BASIC METRONOME</title>
-	<script type="text/javascript" charset="UTF-8" src="http://tambien.github.com/MSG.js/src/MSG.js"></script>
 	<script type="text/javascript" charset="UTF-8" src="../src/Metro.js"></script>
 </head>
 <body>
@@ -9,11 +8,11 @@
 		//make a metronome
 		METRO.start();
 		//route anything after the slash
-		MSG.route("/metro/4n", function(msg) {
+		METRO.route("/metro/4n", function(msg) {
 			document.getElementById("halfNumber").innerHTML = msg.data;
 		})
 		//route anything after the slash
-		MSG.route("/metro/1n", function(msg) {
+		METRO.route("/metro/1n", function(msg) {
 			document.getElementById("wholeNumber").innerHTML = msg.data;
 		})
 	</script>
